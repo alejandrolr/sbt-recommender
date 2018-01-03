@@ -27,10 +27,13 @@ object RunRecommender {
     //val spark = SparkSession.builder().getOrCreate()
     // Optional, but may help avoid errors due to long lineage
     //spark.sparkContext.setCheckpointDir("hdfs:///tmp/")
-    spark.sparkContext.setCheckpointDir("/home/alejandro/sbt-recommender/dataset/")
+    //spark.sparkContext.setCheckpointDir("/home/alejandro/sbt-recommender/dataset/")
+    spark.sparkContext.setCheckpointDir("/sbt-recommender/dataset/")
 
     //val base = "hdfs:///user/ds/"
-    val base = "/home/alejandro/sbt-recommender/dataset/"
+    //val base = "/home/alejandro/sbt-recommender/dataset/"
+    val base = "/sbt-recommender/dataset/"
+    
     val rawUserArtistData = spark.read.textFile(base + "user_artist_data_00_00.txt")
     val rawArtistData = spark.read.textFile(base + "artist_data.txt")
     val rawArtistAlias = spark.read.textFile(base + "artist_alias.txt")
