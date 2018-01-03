@@ -46,8 +46,10 @@ RUN curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_V
   apt-get install sbt && \
   sbt sbtVersion
 
-# download and compile recommendersource code
-RUN git clone https://github.com/alejandrolr/sbt-recommender.git && cd sbt-recommender && sbt compile
+# download and compile recommender source code
+RUN git clone https://github.com/alejandrolr/sbt-recommender.git && cd sbt-recommender && \
+    sbt compile && sbt package
+
 # We will be running our Spark jobs as `root` user.
 USER root
 
