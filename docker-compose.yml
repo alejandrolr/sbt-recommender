@@ -1,0 +1,45 @@
+version: "3"
+services:
+
+  recommender:
+    image: alejandrolr/recommender-hadoop:latest
+    hostname: recommender-hadoop
+    container_name: recommender-hadoop
+    networks:
+      - hadoop
+    depends_on:
+      - hadoop-master
+    stdin_open: true
+
+  hadoop-master:
+    image: alejandrolr/hadoop-cluster:latest
+    volumes:
+      - /Users/alejandrolopez/hadoop-cluster/dataset:/root/dataset
+    hostname: hadoop-master
+    container_name: hadoop-master
+    networks:
+      - hadoop
+    ports:
+      - 50070:50070
+      - 8088:8088
+      - 9000:9000
+    stdin_open: true
+
+  hadoop-slave1:
+    image: alejandrolr/hadoop-cluster:latest
+    hostname: hadoop-slave1
+    container_name: hadoop-slave1
+    networks:
+      - hadoop
+    stdin_open: true
+  
+  hadoop-slave2:
+    image: alejandrolr/hadoop-cluster:latest
+    hostname: hadoop-slave2
+    container_name: hadoop-slave2
+    networks:
+      - hadoop
+    stdin_open: true
+
+networks:
+  hadoop:
