@@ -32,7 +32,7 @@ services:
     networks:
       - hadoop
     stdin_open: true
-  
+
   hadoop-slave2:
     image: alejandrolr/hadoop-cluster:latest
     hostname: hadoop-slave2

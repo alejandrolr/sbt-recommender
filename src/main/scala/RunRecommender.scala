@@ -24,6 +24,7 @@ object RunRecommender {
       .config("spark.master", "local")
       .getOrCreate();
 
+    val userID = args(0)
     //val spark = SparkSession.builder().getOrCreate()
     // Optional, but may help avoid errors due to long lineage
     spark.sparkContext.setCheckpointDir("hdfs://hadoop-master:9000/dataset/")
@@ -40,9 +41,9 @@ object RunRecommender {
 
     val runRecommender = new RunRecommender(spark)
     runRecommender.preparation(rawUserArtistData, rawArtistData, rawArtistAlias)
-    runRecommender.model(rawUserArtistData, rawArtistData, rawArtistAlias)
+    runRecommender.model(rawUserArtistData, rawArtistData, rawArtistAlias, userID)
     runRecommender.evaluate(rawUserArtistData, rawArtistAlias)
-    runRecommender.recommend(rawUserArtistData, rawArtistData, rawArtistAlias)
+    runRecommender.recommend(rawUserArtistData, rawArtistData, rawArtistAlias, userID)
   }
 
 }
@@ -75,7 +76,8 @@ class RunRecommender(private val spark: SparkSession) {
   def model(
       rawUserArtistData: Dataset[String],
       rawArtistData: Dataset[String],
-      rawArtistAlias: Dataset[String]): Unit = {
+      rawArtistAlias: Dataset[String],
+      user: String): Unit = {
 
     val bArtistAlias = spark.sparkContext.broadcast(buildArtistAlias(rawArtistAlias))
 
@@ -98,7 +100,8 @@ class RunRecommender(private val spark: SparkSession) {
 
     model.userFactors.select("features").show(truncate = false)
 
-    val userID = 1000019
+    //val userID = 1000019
+    val userID = user.toInt
 
     val existingArtistIDs = trainData.
       filter($"user" === userID).
@@ -167,7 +170,8 @@ class RunRecommender(private val spark: SparkSession) {
   def recommend(
       rawUserArtistData: Dataset[String],
       rawArtistData: Dataset[String],
-      rawArtistAlias: Dataset[String]): Unit = {
+      rawArtistAlias: Dataset[String],
+      user: String): Unit = {
 
     val bArtistAlias = spark.sparkContext.broadcast(buildArtistAlias(rawArtistAlias))
     val allData = buildCounts(rawUserArtistData, bArtistAlias).cache()
@@ -180,7 +184,8 @@ class RunRecommender(private val spark: SparkSession) {
       fit(allData)
     allData.unpersist()
 
-    val userID = 1000019
+    //val userID = 1000019
+    val userID = user.toInt
     val topRecommendations = makeRecommendations(model, userID, 5)
 
     val recommendedArtistIDs = topRecommendations.select("artist").as[Int].collect()
